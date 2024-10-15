@@ -5,40 +5,43 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-class CarCategoryPage extends StatefulWidget {
+class GamingCategoryPage extends StatefulWidget {
+  const GamingCategoryPage({super.key});
+
   @override
-  _CarCategoryPageState createState() => _CarCategoryPageState();
+  // ignore: library_private_types_in_public_api
+  _GamingCategoryPageState createState() => _GamingCategoryPageState();
 }
 
-class _CarCategoryPageState extends State<CarCategoryPage> {
+class _GamingCategoryPageState extends State<GamingCategoryPage> {
   final String accessKey = 'd0_EXYFzFzYZfsCmPREA7IOk_86JwsjT6NNPg13wXzc'; // Unsplash API Key
-  List<String> carImages = [];
-  bool isLoading = true;
+  List<String> gamingImages = []; // List to hold gaming images
+  bool isLoading = true; // Loading state
 
   @override
   void initState() {
     super.initState();
-    fetchCarImages();
+    fetchGamingImages(); // Fetch gaming images when the page initializes
   }
 
-  // Function to fetch car images from Unsplash API
-  Future<void> fetchCarImages() async {
+  // Function to fetch gaming images from Unsplash API
+  Future<void> fetchGamingImages() async {
     final response = await http.get(Uri.parse(
-        'https://api.unsplash.com/search/photos?query=car&per_page=30&client_id=$accessKey'));
+        'https://api.unsplash.com/search/photos?query=gaming&per_page=30&client_id=$accessKey'));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      List<String> fetchedCarImages = [];
+      List<String> fetchedGamingImages = []; // List to hold fetched images
       for (var result in data['results']) {
         String imageUrl = result['urls']['small'];
-        fetchedCarImages.add(imageUrl);
+        fetchedGamingImages.add(imageUrl); // Add each image URL to the list
       }
       setState(() {
-        carImages = fetchedCarImages;
-        isLoading = false;
+        gamingImages = fetchedGamingImages; // Update state with fetched images
+        isLoading = false; // Set loading to false
       });
     } else {
-      throw Exception('Failed to load car images');
+      throw Exception('Failed to load gaming images');
     }
   }
 
@@ -48,7 +51,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
       Dio dio = Dio();
       Directory appDocDir = await getApplicationDocumentsDirectory();
       String savePath = '${appDocDir.path}/${url.split('/').last}';
-      await dio.download(url, savePath);
+      await dio.download(url, savePath); // Download the image
       return savePath; // Return the local file path
     } catch (e) {
       print('Error downloading image: $e');
@@ -61,7 +64,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Car Wallpapers",
+          "Gaming Wallpapers",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -78,7 +81,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.6,
               ),
-              itemCount: carImages.length,
+              itemCount: gamingImages.length, // Use gamingImages
               itemBuilder: (context, index) {
                 return Stack(
                   children: [
@@ -86,7 +89,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
-                          image: NetworkImage(carImages[index]), // Display image from URL
+                          image: NetworkImage(gamingImages[index]), // Display image from URL
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -95,13 +98,13 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                       top: 8,
                       right: 8,
                       child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.download,
                           color: Colors.white,
                           size: 24,
                         ),
                         onPressed: () async {
-                          String imagePath = await downloadImage(carImages[index]);
+                          String imagePath = await downloadImage(gamingImages[index]);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(

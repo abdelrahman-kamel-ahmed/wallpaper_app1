@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:wallpaper_app1/carcategorypage.dart';
+import 'package:wallpaper_app1/gamingcategorypage.dart';
 
 class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
@@ -13,8 +13,7 @@ class CategoryPage extends StatefulWidget {
 }
 
 class _CategoryPageState extends State<CategoryPage> {
-  final String accessKey =
-      'd0_EXYFzFzYZfsCmPREA7IOk_86JwsjT6NNPg13wXzc'; // Replace with your Unsplash API key
+  final String accessKey = 'd0_EXYFzFzYZfsCmPREA7IOk_86JwsjT6NNPg13wXzc';
   Map<String, List<String>> categoryImages = {};
   bool isLoading = true;
 
@@ -59,7 +58,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
   Future<List<String>> fetchImagesForCategory(String query) async {
     final url = Uri.parse(
-        'https://api.unsplash.com/search/photos?query=$query&per_page=5&client_id=$accessKey');
+        'https://api.unsplash.com/search/photos?query=$query&per_page=1&client_id=$accessKey');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -84,9 +83,7 @@ class _CategoryPageState extends State<CategoryPage> {
         ),
       ),
       body: isLoading
-          ? const Center(
-              child:
-                  CircularProgressIndicator()) // Show loading spinner while fetching images
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
               padding: const EdgeInsets.all(12.0),
               child: GridView.builder(
@@ -104,39 +101,44 @@ class _CategoryPageState extends State<CategoryPage> {
                   return GestureDetector(
                     onTap: () {
                       if (title == 'Car') {
-                        Get.to(CarCategoryPage());
-                      } // You can implement navigation to detailed category page here
+                        Get.to(() => CarCategoryPage());
+                      } else if (title == 'Gaming') {
+                        Get.to(() => GamingCategoryPage());
+                      }
+                      // Add more navigation cases if needed
                     },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        image: images.isNotEmpty
-                            ? DecorationImage(
-                                image: NetworkImage(
-                                    images[0]), // Display the first image
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                        color: Colors.grey[
-                            300], // Placeholder color while loading images
-                      ),
-                      child: Center(
-                        child: Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            shadows: [
-                              Shadow(
-                                offset: Offset(0, 0),
-                                blurRadius: 5.0,
-                                color: Colors.black,
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            image: images.isNotEmpty
+                                ? DecorationImage(
+                                    image: NetworkImage(images[0]),
+                                    fit: BoxFit.cover,
+                                  )
+                                : null,
+                            color: Colors.grey[300],
+                          ),
+                          child: Center(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                shadows: [
+                                  Shadow(
+                                    offset: Offset(0, 0),
+                                    blurRadius: 5.0,
+                                    color: Colors.black,
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
                   );
                 },

@@ -5,44 +5,81 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-class CarCategoryPage extends StatefulWidget {
+class SearchResultsPage extends StatefulWidget {
+  final String title; // Variable title for the page
+  final String searchQuery; // Variable for search query
+
+  const SearchResultsPage({
+    Key? key,
+    required this.title,
+    required this.searchQuery,
+  }) : super(key: key);
+
   @override
-  _CarCategoryPageState createState() => _CarCategoryPageState();
+  _SearchResultsPageState createState() => _SearchResultsPageState();
 }
 
-class _CarCategoryPageState extends State<CarCategoryPage> {
-  final String accessKey = 'd0_EXYFzFzYZfsCmPREA7IOk_86JwsjT6NNPg13wXzc'; // Unsplash API Key
-  List<String> carImages = [];
+class _SearchResultsPageState extends State<SearchResultsPage> {
+  final String accessKey =
+      'd0_EXYFzFzYZfsCmPREA7IOk_86JwsjT6NNPg13wXzc'; // Replace with your Unsplash API Key
+  List<String> imageUrls = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchCarImages();
+    fetchImages(); // Fetch images based on the search query
   }
 
-  // Function to fetch car images from Unsplash API
-  Future<void> fetchCarImages() async {
+  Future<void> fetchImages() async {
+    if (widget.searchQuery.isEmpty) {
+      print('Search query is empty.');
+      throw Exception('Search query cannot be empty.');
+    }
+
+    // URL-encode the search query
+    final encodedQuery = Uri.encodeComponent(widget.searchQuery);
     final response = await http.get(Uri.parse(
-        'https://api.unsplash.com/search/photos?query=car&per_page=30&client_id=$accessKey'));
+        'https://api.unsplash.com/search/photos?query=$encodedQuery&per_page=30&client_id=$accessKey'));
+
+    print('Response Status Code: ${response.statusCode}');
+    print('Response Headers: ${response.headers}');
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
-      List<String> fetchedCarImages = [];
+      List<String> fetchedImages = [];
       for (var result in data['results']) {
         String imageUrl = result['urls']['small'];
-        fetchedCarImages.add(imageUrl);
+        fetchedImages.add(imageUrl);
       }
       setState(() {
-        carImages = fetchedCarImages;
+        imageUrls = fetchedImages;
         isLoading = false;
       });
     } else {
-      throw Exception('Failed to load car images');
+      String errorMessage;
+      switch (response.statusCode) {
+        case 400:
+          errorMessage = 'Bad Request: Check your query.';
+          break;
+        case 401:
+          errorMessage = 'Unauthorized: Check your API key.';
+          break;
+        case 404:
+          errorMessage = 'Not Found: No images found for this query.';
+          break;
+        case 500:
+          errorMessage = 'Server Error: Try again later.';
+          break;
+        default:
+          errorMessage = 'Unexpected error: ${response.statusCode}';
+          break;
+      }
+      print('Error: $errorMessage');
+      throw Exception(errorMessage);
     }
   }
 
-  // Function to download image and save it locally using Dio
   Future<String> downloadImage(String url) async {
     try {
       Dio dio = Dio();
@@ -60,10 +97,11 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          "Car Wallpapers",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: Text(
+          "${widget.title}wallpapers",
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ), // Display the dynamic title
+        centerTitle: true,
       ),
       body: isLoading
           ? const Center(
@@ -78,7 +116,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                 crossAxisSpacing: 12,
                 childAspectRatio: 0.6,
               ),
-              itemCount: carImages.length,
+              itemCount: imageUrls.length,
               itemBuilder: (context, index) {
                 return Stack(
                   children: [
@@ -86,7 +124,7 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         image: DecorationImage(
-                          image: NetworkImage(carImages[index]), // Display image from URL
+                          image: NetworkImage(imageUrls[index]),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -95,19 +133,20 @@ class _CarCategoryPageState extends State<CarCategoryPage> {
                       top: 8,
                       right: 8,
                       child: IconButton(
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.download,
                           color: Colors.white,
                           size: 24,
                         ),
                         onPressed: () async {
-                          String imagePath = await downloadImage(carImages[index]);
+                          String imagePath =
+                              await downloadImage(imageUrls[index]);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                  imagePath.isNotEmpty
-                                      ? 'Downloaded to $imagePath'
-                                      : 'Download failed',
+                                imagePath.isNotEmpty
+                                    ? 'Downloaded to $imagePath'
+                                    : 'Download failed',
                               ),
                             ),
                           );
