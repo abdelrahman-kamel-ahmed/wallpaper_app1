@@ -9,6 +9,7 @@ class CategoryPage extends StatefulWidget {
   const CategoryPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CategoryPageState createState() => _CategoryPageState();
 }
 
@@ -103,7 +104,7 @@ class _CategoryPageState extends State<CategoryPage> {
                       if (title == 'Car') {
                         Get.to(() => CarCategoryPage());
                       } else if (title == 'Gaming') {
-                        Get.to(() => GamingCategoryPage());
+                        Get.to(() => const GamingCategoryPage());
                       }
                       // Add more navigation cases if needed
                     },

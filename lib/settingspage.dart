@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _SettingsPageState createState() => _SettingsPageState();
 }
 
@@ -79,7 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
       leading: Icon(icon, color: Colors.black),
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
       ),
       trailing: const Icon(Icons.arrow_forward_ios, size: 18),
       onTap: onTap,

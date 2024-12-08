@@ -158,7 +158,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: IconButton(
               onPressed: () {
-                Get.to(CategoryPage()); // Remove searchQuery parameter
+                Get.to(const CategoryPage()); // Remove searchQuery parameter
               },
               icon: const Icon(Icons.category_sharp),
             ),
@@ -167,7 +167,7 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             icon: IconButton(
               onPressed: () {
-                Get.to(SettingsPage());
+                Get.to(const SettingsPage());
               },
               icon: const Icon(Icons.settings),
             ),
@@ -259,6 +259,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               // Category wheel with dynamic API images
+              // ignore: sized_box_for_whitespace
               Container(
                 height: 70,
                 child: ListView(
@@ -296,7 +297,7 @@ class _HomePageState extends State<HomePage> {
                 margin: const EdgeInsets.all(10),
                 width: 330,
                 decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 139, 172, 232),
+                    color: Color.fromARGB(255, 255, 255, 255),
                     border: Border.all(
                         color: const Color.fromRGBO(203, 218, 245, 1)),
                     borderRadius: BorderRadius.circular(30)),
